@@ -1,0 +1,40 @@
+.TH INI 3
+.SH NAME
+ini_parse_file \- a lightweight configuration file parser
+.SH SYNOPSIS
+.B
+#include "ini.h"
+
+.B int ini_parse_file
+(\fBFILE* \fIfp\fR
+\fBint \fI(*callback)\fR(\fBchar* \fIsection\fR, \fBchar* \fIvariable\fR, \fBchar* \fIvalue\fR)\fR)
+.SH DESCRIPTION
+Parse a stream and extract out configuration values, using a callback function.
+No dynamic memory is allocated.
+.SH OPTIONS
+.TP 
+\fBFILE* \fIfp\fR
+Stream to parse.
+.TP 
+\fI(*callback)\fR(\fBchar* \fIsection\fR, \fBchar* \fIvariable\fR, \fBchar* \fIvalue\fR)\fR
+Callback function, must accept three null-terminated character arrays.
+.TP
+\fB#define \fIBUFFER_SIZE\fR
+Size of section header names, configuration variables, and values to accept.
+.SH "RETURN VALUE"
+Upon successful completion, ini_parse_file returns 0. 
+.PP 
+Failure to read the file, or values exceeding \fIBUFFER_SIZE\fR will result in a return value of -1
+.SH FILES
+.I ini.h
+.RS 
+Library header file
+.BR ini(5)
+for further details on the ini file format
+
+.SH AUTHOR
+Michael Lazear
+.I
+@lazear
+.SH "SEE ALSO"
+.BR ini(5)

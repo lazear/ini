@@ -1,0 +1,6 @@
+EXAMPLES= examples
+EXSRC = $(wildcard $(EXAMPLES)/*.c)
+EXOBJ = $(EXSRC:.c=.o)
+
+example: $(EXOBJ)
+	$(CC) $(CFLAGS) $(EXOBJ) $(TARGET).a -o $(BUILD)/example
