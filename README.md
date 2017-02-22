@@ -16,14 +16,16 @@ make install
 ### Examples
 See examples/main.c
 
-```
+ini file:
+```ini
 [section]
 var=value
 name=me
 town = Nowhere, USA
 ```
 
-```
+C file:
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include "ini.h"
