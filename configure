@@ -147,9 +147,9 @@ clean:
 dist: $(TARGET) clean 
 	@echo "creating distribution archive $(PROJECT)-$(VERSION).tar.gz"
 	if [ -d $(DOCS) ]; then \
-		tar -czvf $(PROJECT)-$(VERSION).tar.gz configure Makefile $(DOCS) $(TARGET) $(SRC_DIR) $(IN_DIR); \
+		tar -czvf $(PROJECT)-$(VERSION).tar.gz configure Makefile $(DOCS) $(BUILD) $(SRC_DIR) $(IN_DIR); \
 	else \
-		tar -czvf $(PROJECT)-$(VERSION).tar.gz configure Makefile $(TARGET) $(SRC_DIR) $(INC_DIR); \
+		tar -czvf $(PROJECT)-$(VERSION).tar.gz configure Makefile $(BUILD) $(SRC_DIR) $(INC_DIR); \
 	fi 
 
 install: $(TARGET)
