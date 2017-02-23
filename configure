@@ -114,6 +114,7 @@ cat << EOF >> $OUTPUT
 export AR       = $(which ar)
 export ARFLAGS  = -cru
 
+export LIB      = "lib$(echo $PROJECT | sed -e 's/^lib//g').a"
 EOF
 fi
 
@@ -153,13 +154,13 @@ dist: $(TARGET) clean
 	fi 
 
 install: $(TARGET)
-	if [ -f $(TARGET).a ]; then \
+	if [ -f $(BUILD)/$(LIB) ]; then \
 		mkdir -p $(PREFIX)/lib; \
 		mkdir -p $(PREFIX)/include; \
-		echo "installing lib$(PROJECT).a in $(PREFIX)/lib"; \
-		cp -uv $(TARGET).a $(PREFIX)/lib/lib$(PROJECT).a-$(VERSION); \
-		cp -tuv $(PREFIX)/ $(HEADERS); \
-		ln -sf $(PREFIX)/lib/lib$(PROJECT).a-$(VERSION) $(PREFIX)/lib/lib$(PROJECT).a; \
+		echo "installing $(LIB) in $(PREFIX)/lib"; \
+		cp -uv $(BUILD)/$(LIB) $(PREFIX)/lib/$(LIB)-$(VERSION); \
+		cp -uv -t $(PREFIX)/include $(HEADERS); \
+		ln -sf $(PREFIX)/lib/$(LIB)-$(VERSION) $(PREFIX)/lib/$(LIB); \
 	elif [ -f $(TARGET) ]; then \
 		mkdir -p $(PREFIX)/bin; \
 		echo "installing $(PROJECT) in $(PREFIX)/bin"; \
@@ -167,24 +168,24 @@ install: $(TARGET)
 		chmod 0755 $(PREFIX)/bin/$(PROJECT)-$(VERSION); \
 		ln -sf $(PREFIX)/bin/$(PROJECT)-$(VERSION) $(PREFIX)/bin/$(PROJECT); \
 	else \
-		echo "Could not find $(TARGET) or $(TARGET).a"; \
+		echo "Could not find $(TARGET) or $(BUILD)/$(LIB)"; \
 	fi
 	if [ -f $(DOCS)/$(PROJECT).[1-7] ]; then \
 		mkdir -p $(MANPATH); \
-		cp -uv $(DOCS)/$(PROJECT).[1-7] $(MANPATH)/; \
+		cp -uv -t $(MANPATH) $(DOCS)/$(PROJECT).[1-7]; \
 	fi;
 
 uninstall:
-	if [ -f $(PREFIX)/lib/lib$(PROJECT).a-$(VERSION) ]; then \
-		echo "uninstalling lib$(PROJECT).a from $(PREFIX)/lib"; \
-		rm -rf $(PREFIX)/lib/lib$(PROJECT).a-$(VERSION); \
-		rm -rf $(PREFIX)/lib/lib$(PROJECT).a; \
+	if [ -f $(PREFIX)/lib/$(LIB)-$(VERSION) ]; then \
+		echo "uninstalling $(LIB) from $(PREFIX)/lib"; \
+		rm -rf $(PREFIX)/lib/$(LIB)-$(VERSION); \
+		rm -rf $(PREFIX)/lib/$(LIB); \
 	elif [ -f $(PREFIX)/bin/$(PROJECT)-$(VERSION) ]; then \
 		echo "uninstalling $(PROJECT) from $(PREFIX)/bin"; \
 		rm -rf $(PREFIX)/bin/$(PROJECT)-$(VERSION); \
 		rm -rf $(PREFIX)/bin/$(PROJECT); \
 	else \
-		echo "Could not find $(PREFIX)/bin/$(PROJECT)-$(VERSION) or $(PREFIX)/lib/lib$(PROJECT).a-$(VERSION)"; \
+		echo "Could not find $(PREFIX)/bin/$(PROJECT)-$(VERSION) or $(PREFIX)/lib/$(LIB)-$(VERSION)"; \
 	fi
 	if [ -f $(DOCS)/$(PROJECT).[1-7] ]; then \
 		rm -rf $(MANPATH)/$(PROJECT).[1-7]; \
@@ -207,7 +208,7 @@ else
 cat << 'EOF' >> $OUTPUT
 $(TARGET): $(OBJECTS) $(HEADERS)
 	@echo "building $(PROJECT)"
-	@$(AR) $(ARFLAGS) $(TARGET).a $(OBJECTS)
+	@$(AR) $(ARFLAGS) $(BUILD)/$(LIB) $(OBJECTS)
 EOF
 fi
 printf "# End of auto-generated Makefile\n\n" >> $OUTPUT
@@ -319,6 +320,7 @@ clean() {
 
 # If Makefile exists, grab the existing PROJECT_VER and CFLAGS variables and use them
 if [ -f $OUTPUT ]; then
+	PROJECT=$(cat $OUTPUT | grep "export PROJECT" | sed -e 's/^.*=\s*//g')
 	PROJECT_VER=$(cat $OUTPUT | grep "export VERSION" | sed -e 's/^.*=[ ]*//g')
 	CFLAGS=$(cat $OUTPUT | grep "export CFLAGS" | sed -e 's/^export CFLAGS\s*=\s*//')
 	MANPATH=$(cat $OUTPUT | grep "export MANPATH" | sed -e 's/^.*=\s*//g')

@@ -12,17 +12,16 @@ static int read_until(FILE* fp, char* buffer, int size, int delim)
 	int string = 0;
 	while (i < size) {
 		c = getc(fp);
-		if(isblank(c) && string == 0)
+		if(isblank(c) && string == 0) {
 			continue;
-		if (c == '\"')
+		} else if (c == '\"') {
 			string = 1;
-		if (c == delim) {
+		} else if (c == delim) {
 			buffer[i] = '\0';
 			if (delim == '=')
 				ungetc(c, fp);
 			return 0;
-		}
-		if (c == EOF) {
+		} else if (c == EOF) {
 			return 0;
 		}
 		buffer[i++] = c;
